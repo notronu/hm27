@@ -1,5 +1,7 @@
 package com.example.Algoritms2;
 
+import java.util.Arrays;
+
 public class StringListImpl implements StringList {
 
 

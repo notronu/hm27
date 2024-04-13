@@ -1,5 +1,13 @@
 package com.example.Algoritms2;
 
+import java.util.Arrays;
+import java.util.Random;
+import java.util.stream.IntStream;
+
+import static com.example.Algoritms2.IntegerList.*;
+import static com.example.Algoritms2.IntegerListImpl.sortInsertion;
+import static com.example.Algoritms2.IntegerListImpl.swapElements;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -13,185 +21,178 @@ public class Main {
 
         sortInsertion(randomIntsArray);
 
+        mergeSort(randomIntsArray);
+        quickSort(randomIntsArray, 0, 299000);
 
-        quickSortOptimize(randomIntsArray);
+        int[] copy = Arrays.copyOf(randomIntsArray, randomIntsArray.length);
 
 
         long start = System.currentTimeMillis();
 
-        sortSelection(randomIntsArray);
+        quickSort(randomIntsArray, 0, 299000);
+        mergeSort(randomIntsArray);
 
-        sortBubble(randomIntsArray);
+        System.out.println("Быстрая сортировка quickSort для " + copy.length + " элементов составила: "
+                + ((System.currentTimeMillis() - start) / 1000d / 60 + " минут "));
+        System.out.println("сортировка слиянием (mergeSort) для " + copy.length + " элементов составила: "
+                + ((System.currentTimeMillis() - start) / 1000d / 60 + " минут "));
 
-        sortInsertion(randomIntsArray);
 
-        quickSortOptimize(randomIntsArray);
-
-        System.out.println(System.currentTimeMillis() - start);
     }
 
 
-    private static void quickSortOptimize(int[] randomIntsArray) {
 
-        boolean sorted = true;
+    private static void quickSort(int[] randomIntsArray, int begin, int end) {
+        if (begin < end) {
+            int[] copy = Arrays.copyOf(randomIntsArray, randomIntsArray.length);
+            long start = System.currentTimeMillis();
+            int partitionIndex = partition(copy, begin, end);
 
-        int temp;
+            quickSort(copy, begin, partitionIndex - 1);
+            quickSort(copy, partitionIndex + 1, end);
 
-        while (!sorted) {
+        }
+    }
 
-            sorted = true;
+    private static int partition(int[] copy, int begin, int end) {
 
-            for (int i = 0; i < randomIntsArray.length - 1; i++) {
+        int pivot = copy[end];
+        int i = (begin - 1);
+        long start = System.currentTimeMillis();
+        for (int j = begin; j < end; j++) {
+            if (copy[j] <= pivot) {
+                i++;
 
-                if (randomIntsArray[i] > randomIntsArray[i + 1]) {
-
-                    temp = randomIntsArray[i];
-
-                    randomIntsArray[i] = randomIntsArray[i + 1];
-
-                    randomIntsArray[i + 1] = temp;
-
-                    sorted = false;
-                }
+                swapElements(copy, i, j);
             }
+        }
+        swapElements(copy, i + 1, end);
+        return i + 1;
+    }
+
+
+    public static void mergeSort(int[] randomIntsArray) {
+        int[] copy = Arrays.copyOf(randomIntsArray, randomIntsArray.length);
+        long start = System.currentTimeMillis();
+        if (copy.length < 2) {
+            return;
+        }
+        int mid = copy.length / 2;
+        int[] left = new int[mid];
+        int[] right = new int[copy.length - mid];
+
+        for (int i = 0; i < left.length; i++) {
+            left[i] = copy[i];
+        }
+
+        for (int i = 0; i < right.length; i++) {
+            right[i] = copy[mid + i];
+        }
+
+        mergeSort(left);
+        mergeSort(right);
+
+        merge(copy, left, right);
+
+    }
+
+
+    public static void merge(int[] copy, int[] left, int[] right) {
+
+        long start = System.currentTimeMillis();
+
+
+        int mainP = 0;
+        int leftP = 0;
+        int rightP = 0;
+        while (leftP < left.length && rightP < right.length) {
+            if (left[leftP] <= right[rightP]) {
+                copy[mainP++] = left[leftP++];
+            } else {
+                copy[mainP++] = right[rightP++];
+            }
+        }
+        while (leftP < left.length) {
+            copy[mainP++] = left[leftP++];
+        }
+        while (rightP < right.length) {
+            copy[mainP++] = right[rightP++];
+
+
         }
     }
 
 
+    public static void sortBubble(int[] randomIntsArray) {
 
+        int[] copy = Arrays.copyOf(randomIntsArray, randomIntsArray.length);
+        long start = System.currentTimeMillis();
 
-    private static void sortInsertion2(int[] randomIntsArray) {
+        for (int i = 0; i < copy.length - 1; i++) {
+            for (int j = 0; j < copy.length - 1 - i; j++) {
+                if (copy[j] > copy[j + 1]) {
 
-        for (int i = 1; i < randomIntsArray.length; i++) {
-
-            int current = randomIntsArray[i];
-
-            int j = i - 1;
-
-            while (j >= 0 && current < randomIntsArray[j]) {
-
-                randomIntsArray[j + 1] = randomIntsArray[j];
-
-                j--;
-            }
-
-
-            randomIntsArray[j + 1] = current;
-        }
-    }
-
-    public static void sortInsertion(int[] arr) {
-
-        for (int i = 1; i < arr.length; i++) {
-
-            int temp = arr[i];
-
-            int j = i;
-
-            while (j > 0 && arr[j - 1] >= temp) {
-
-                arr[j] = arr[j - 1];
-
-                j--;
-            }
-            arr[j] = temp;
-        }
-    }
-
-
-    private static void sortBubble2(int[] randomIntsArray) {
-
-        boolean sorted = false;
-
-        int temp;
-
-        while (!sorted) {
-
-            sorted = true;
-
-            for (int i = 0; i < randomIntsArray.length - 1; i++) {
-
-                if (randomIntsArray[i] > randomIntsArray[i + 1]) {
-
-                    temp = randomIntsArray[i];
-
-                    randomIntsArray[i] = randomIntsArray[i + 1];
-
-                    randomIntsArray[i + 1] = temp;
-
-                    sorted = false;
-                }
-            }
-        }
-    }
-
-
-    public static void sortBubble(int[] arr) {
-
-        for (int i = 0; i < arr.length - 1; i++) {
-
-            for (int j = 0; j < arr.length - 1 - i; j++) {
-
-                if (arr[j] > arr[j + 1]) {
-
-                    swapElements(arr, j, j + 1);
-                }
-            }
-        }
-    }
-
-
-    private static void swapElements(int[] arr, int j, int i) {
-    }
-
-
-    private static void sortSelection2(int[] randomIntsArray) {
-
-        for (int i = 0; i < randomIntsArray.length; i++) {
-
-            int min = randomIntsArray[i];
-
-            int minId = i;
-
-            for (int j = i + 1; j < randomIntsArray.length; j++) {
-
-                if (randomIntsArray[j] < min) {
-
-                    min = randomIntsArray[j];
-
-                    minId = j;
+                    swapElements(copy, j, j + 1);
                 }
             }
 
-
-            int temp = randomIntsArray[i];
-
-            randomIntsArray[i] = min;
-
-            randomIntsArray[minId] = temp;
+            System.out.println(" Пузырьковая сортировка (bubbleSpeed) для " + copy.length + " элементов составила: "
+                    + ((System.currentTimeMillis() - start) / 1000d / 60 + " минут "));
         }
     }
 
 
+            public static void sortSelection (int[] randomIntsArray){
+                int[] copy = Arrays.copyOf(randomIntsArray, randomIntsArray.length);
+                long start = System.currentTimeMillis();
 
+                for (int i = 0; i < copy.length - 1; i++) {
+                    int minElementIndex = i;
+                    for (int j = i + 1; j < copy.length; j++) {
+                        if (copy[j] < copy[minElementIndex]) {
+                            minElementIndex = j;
+                        }
+                    }
 
+                    swapElements(copy, i, minElementIndex);
+                }
 
-    public  void sortInsertion_(int[] arr) {
+                System.out.println("Сортировка выбором (sortSelection) для " + copy.length + " элементов составила: "
+                        + ((System.currentTimeMillis() - start) / 1000d / 60 + " минут "));
 
-        for (int i = 1; i < arr.length; i++) {
-
-            int temp = arr[i];
-
-            int j = i;
-
-            while (j > 0 && arr[j - 1] >= temp) {
-
-                arr[j] = arr[j - 1];
-
-                j--;
             }
 
-            arr[j] = temp;
+
+            public static void sortInsertion ( int[] randomIntsArray){
+
+
+                int[] copy = Arrays.copyOf(randomIntsArray, randomIntsArray.length);
+
+                long start = System.currentTimeMillis();
+
+                for (int i = 1; i < copy.length; i++) {
+                    int temp = copy[i];
+                    int j = i;
+                    while (j > 0 && copy[j - 1] >= temp) {
+                        copy[j] = copy[j - 1];
+                        j--;
+                    }
+
+                    copy[j] = temp;
+                }
+
+                System.out.println("Сортировка  вставкой (sortInsertion) для " + copy.length + " элементов составила: "
+                        + ((System.currentTimeMillis() - start) / 1000d / 60 + " минут "));
+            }
+
+            public static void swapElements ( int[] copy, int indexA, int indexB){
+                int tmp = copy[indexA];
+                copy[indexA] = copy[indexB];
+                copy[indexB] = tmp;
+
+
+            }
         }
-    }
-}
+
+
+
